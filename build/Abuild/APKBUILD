@@ -1,0 +1,39 @@
+pkgname=libarchive
+pkgver=3.8.0
+pkgrel=1
+pkgdesc="Multi-format archive and compression library"
+url="https://libarchive.org/"
+arch="all"
+license="BSD-2-Clause AND BSD-3-Clause AND LicenseRef-scancode-public-domain"
+options="!check"
+depends="bzip2 libxml2 lz4 openssl xz zlib-ng zstd"
+makedepends="bzip2-dev libxml2-dev lz4-dev openssl-dev xz-dev zlib-ng-dev zstd-dev"
+depends_dev=${makedepends}
+subpackages="${pkgname}-dev ${pkgname}-doc ${pkgname}-tools"
+source="https://libarchive.org/downloads/libarchive-${pkgver}.tar.xz"
+builddir=${srcdir}/libarchive-${pkgver}
+
+build() {
+    CFLAGS="$CFLAGS -ffat-lto-objects -flto=auto" \
+    ./configure \
+        --build=$CBUILD \
+        --host=$CHOST \
+        --prefix=/usr \
+        --without-xml2
+    make
+}
+
+package() {
+    make DESTDIR=${pkgdir} install
+}
+
+tools() {
+    pkgdesc="libarchive tools bsdtar and bsdcpio"   
+    depends="$pkgname=$pkgver-r$pkgrel"
+    amove usr/bin
+}
+
+
+sha512sums="
+b0dcee8cb586ce2061987589067bbc063e326471fe36de64cc9c3e8b5eaaaedb85ef2b320be1671e008a32f39bdfc07db4e8abbde58328ab2655c2af0f0984f9  libarchive-3.8.0.tar.xz
+"
